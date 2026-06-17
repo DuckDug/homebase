@@ -26,10 +26,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
@@ -40,26 +41,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        jwt = authHeader.substring(7);
-        username = jwtUtil.extractUsername(jwt);
+        try {
+            jwt = authHeader.substring(7);
+            username = jwtUtil.extractUsername(jwt);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userRepository.findByUsername(username)
-                    .map(user -> org.springframework.security.core.userdetails.User
-                            .withUsername(user.getUsername())
-                            .password(user.getPassword())
-                            .authorities("ROLE_USER")
-                            .build())
-                    .orElseThrow(() -> new RuntimeException("User not found: " + username));
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userRepository.findByUsername(username)
+                        .map(user -> org.springframework.security.core.userdetails.User
+                                .withUsername(user.getUsername())
+                                .password(user.getPassword())
+                                .authorities("ROLE_USER")
+                                .build())
+                        .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-            if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            // invalid token -- clear context and let the request continue unauthenticated
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
