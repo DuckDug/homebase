@@ -21,4 +21,6 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     List<Property> findByPropertyType(String propertyType);
 
     List<Property> findByBedroomsAndCity(Integer bedrooms, String city);
+
+    boolean existsByRentcastId(String rentcastId);
 }
