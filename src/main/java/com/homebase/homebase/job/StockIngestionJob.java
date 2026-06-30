@@ -37,6 +37,13 @@ public class StockIngestionJob {
                 }
             }
 
+            try {
+                /* Only allowed 5 requests per minute */
+                Thread.sleep(13000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
 
         }
 
