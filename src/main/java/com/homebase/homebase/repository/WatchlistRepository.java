@@ -1,10 +1,9 @@
 package com.homebase.homebase.repository;
 
 import com.homebase.homebase.model.Watchlist;
-import org.jspecify.annotations.NonNull;
+import com.homebase.homebase.model.WatchlistStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,7 @@ public interface WatchlistRepository extends JpaRepository<Watchlist, Long> {
 
     List<Watchlist> findByUserId(Long userId);
 
-    List<Watchlist> findByStatus(String status);
+    List<Watchlist> findByStatusAndUserId(WatchlistStatus status, Long userId);
 
     boolean existsByUserIdAndName(Long userId, String name);
 
