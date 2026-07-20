@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
             Authentication authentication
     ) {
         LocalDateTime now = LocalDateTime.now();
-        log.error(
+        log.warn(
                 "Resource not found: {} | name={} | path={}",
                 exception.getMessage(),
                 authentication.getName(),
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
             Authentication authentication
     ) {
         LocalDateTime now = LocalDateTime.now();
-        log.error(
+        log.warn(
                 "Duplicate Resource : {} | name={} | path={}",
                 exception.getMessage(),
                 authentication.getName(),
