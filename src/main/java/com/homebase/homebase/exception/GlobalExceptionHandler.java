@@ -36,4 +36,25 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateResourceException (
+            DuplicateResourceException exception,
+            HttpServletRequest request,
+            Authentication authentication
+    ) {
+        LocalDateTime now = LocalDateTime.now();
+        log.error(
+                "Duplicate Resource : {} | name={} | path={}",
+                exception.getMessage(),
+                authentication.getName(),
+                request.getRequestURI()
+        );
+        ErrorResponse errorResponse = new ErrorResponse(
+                exception.getMessage(),
+                HttpStatus.CONFLICT,
+                now
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
 }
