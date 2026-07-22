@@ -22,7 +22,7 @@ public class WatchlistService {
 
     public WatchlistResponse createWatchlist(Long userId, WatchlistCreateRequest watchlistCreateRequest) {
         String name = watchlistCreateRequest.getName();
-        if (watchlistRepository.existsByUserIdAndName(userId, name)) {
+        if (watchlistRepository.existsByUserIdAndNameIgnoreCase(userId, name)) {
             throw new DuplicateResourceException("Watchlist", "name", name);
         }
 
