@@ -2,6 +2,7 @@ package com.homebase.homebase.service;
 
 import com.homebase.homebase.dto.WatchlistCreateRequest;
 import com.homebase.homebase.dto.WatchlistResponse;
+import com.homebase.homebase.dto.WatchlistUpdateRequest;
 import com.homebase.homebase.exception.DuplicateResourceException;
 import com.homebase.homebase.exception.ResourceNotFoundException;
 import com.homebase.homebase.model.Watchlist;
@@ -58,6 +59,29 @@ public class WatchlistService {
                 ));
         return mapToWatchlistResponse(watchlist);
 
+    }
+
+    public WatchlistResponse updateWatchlist(Long userId, Long id,  WatchlistUpdateRequest watchlistUpdateRequest) {
+        String name = watchlistUpdateRequest.getName();
+        WatchlistStatus status = watchlistUpdateRequest.getStatus();
+        Watchlist watchlist = watchlistRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Watchlist", id));
+
+        if (name != null && !name.equals(watchlist.getName())) {
+            if (watchlistRepository.existsByUserIdAndNameIgnoreCase(userId, name)) {
+                throw new DuplicateResourceException("Watchlist", "name", name);
+            } else {
+                watchlist.setName(name);
+            }
+
+        }
+
+        if (status != null) {
+            watchlist.setStatus(status);
+        }
+
+        Watchlist saved = watchlistRepository.save(watchlist);
+        return mapToWatchlistResponse(saved);
     }
 
     private WatchlistResponse mapToWatchlistResponse(@NonNull Watchlist watchlist) {
