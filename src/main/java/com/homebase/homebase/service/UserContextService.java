@@ -1,6 +1,7 @@
 package com.homebase.homebase.service;
 
 import com.homebase.homebase.dto.UserContextResponse;
+import com.homebase.homebase.exception.ResourceNotFoundException;
 import com.homebase.homebase.model.User;
 import com.homebase.homebase.repository.UserRepository;
 import org.jspecify.annotations.NonNull;
@@ -21,6 +22,12 @@ public class UserContextService {
 
         Optional<User> user = userRepository.findByUsername(authentication.getName());
         return user.map(this::mapToUserContextResponse);
+    }
+
+    public Long getUserId(@NonNull Authentication authentication) {
+        return userContext(authentication)
+                .map(UserContextResponse::getId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", authentication.getName()));
     }
 
     private UserContextResponse mapToUserContextResponse(@NonNull User user) {
