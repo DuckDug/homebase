@@ -59,4 +59,10 @@ public class WatchlistController {
         return ResponseEntity.ok().body(watchlistService.updateWatchlist(userId, id, request));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<WatchlistResponse> deleteWatchlistById(Authentication authentication, @PathVariable Long id) {
+        Long userId = userContextService.getUserId(authentication);
+        return ResponseEntity.ok().body(watchlistService.deleteWatchlist(userId, id));
+    }
+
 }

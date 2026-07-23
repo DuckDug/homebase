@@ -84,6 +84,13 @@ public class WatchlistService {
         return mapToWatchlistResponse(saved);
     }
 
+    public WatchlistResponse deleteWatchlist(Long userId, Long id) {
+        Watchlist watchlist = watchlistRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Watchlist", id));
+        watchlistRepository.delete(watchlist);
+        return mapToWatchlistResponse(watchlist);
+    }
+
     private WatchlistResponse mapToWatchlistResponse(@NonNull Watchlist watchlist) {
         return new WatchlistResponse(
                 watchlist.getId(),
