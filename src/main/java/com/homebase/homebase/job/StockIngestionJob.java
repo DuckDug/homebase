@@ -48,6 +48,7 @@ public class StockIngestionJob {
                 Optional<StockQuote> stockQuotes = stockApiClient.fetchStockQuotes(symbol);
                 if (stockQuotes.isPresent()) {
                     StockQuote stockQuote = stockQuotes.get();
+                    stockQuote.setSymbol(symbol.toUpperCase());
                     if (!stockQuoteRepository.existsBySymbolAndQuoteDate(stockQuote.getSymbol(), stockQuote.getQuoteDate())) {
                         stockQuoteRepository.save(stockQuote);
                         recordsProcessed++;
