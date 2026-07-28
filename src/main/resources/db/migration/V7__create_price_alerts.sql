@@ -16,4 +16,4 @@ COMMENT ON COLUMN price_alerts.status IS 'Stores Price Alert Status: Active/Trig
 
 CREATE INDEX idx_price_alerts_user_id ON price_alerts (user_id);
 CREATE INDEX idx_price_alerts_symbol ON price_alerts (symbol);
-CREATE INDEX idx_price_alerts_symbol_status N price_alerts (symbol, status);
+CREATE INDEX idx_price_alerts_symbol_status ON price_alerts (symbol, status);
