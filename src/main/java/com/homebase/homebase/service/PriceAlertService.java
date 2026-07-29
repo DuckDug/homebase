@@ -3,6 +3,7 @@ package com.homebase.homebase.service;
 import com.homebase.homebase.dto.PriceAlertCreateRequest;
 import com.homebase.homebase.dto.PriceAlertResponse;
 import com.homebase.homebase.exception.DuplicateResourceException;
+import com.homebase.homebase.exception.ResourceNotFoundException;
 import com.homebase.homebase.model.PriceAlert;
 import com.homebase.homebase.model.PriceAlertCondition;
 import com.homebase.homebase.model.PriceAlertStatus;
@@ -45,6 +46,13 @@ public class PriceAlertService {
         PriceAlert saved = priceAlertRepository.save(priceAlert);
 
         return  mapToPriceAlertResponse(saved);
+    }
+
+    public PriceAlertResponse getPriceAlertById(Long userId, Long priceAlertId) {
+        PriceAlert priceAlert = priceAlertRepository.findByIdAndUserId(priceAlertId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Price Alert", priceAlertId));
+
+        return mapToPriceAlertResponse(priceAlert);
     }
 
     private PriceAlertResponse mapToPriceAlertResponse(PriceAlert priceAlert) {
