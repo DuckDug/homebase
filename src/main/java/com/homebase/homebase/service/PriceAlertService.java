@@ -91,6 +91,14 @@ public class PriceAlertService {
         return mapToPriceAlertResponse(priceAlert);
     }
 
+    public PriceAlertResponse deletePriceAlert(Long userId, Long priceAlertId) {
+        PriceAlert priceAlert = priceAlertRepository.findByIdAndUserId(priceAlertId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Price Alert", priceAlertId));
+
+        priceAlertRepository.delete(priceAlert);
+        return mapToPriceAlertResponse(priceAlert);
+    }
+
     private PriceAlertResponse mapToPriceAlertResponse(PriceAlert priceAlert) {
         return new PriceAlertResponse(
                 priceAlert.getId(),
