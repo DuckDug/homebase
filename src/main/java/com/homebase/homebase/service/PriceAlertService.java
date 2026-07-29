@@ -11,6 +11,7 @@ import com.homebase.homebase.repository.PriceAlertRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class PriceAlertService {
@@ -53,6 +54,21 @@ public class PriceAlertService {
                 .orElseThrow(() -> new ResourceNotFoundException("Price Alert", priceAlertId));
 
         return mapToPriceAlertResponse(priceAlert);
+    }
+
+    public List<PriceAlertResponse> getPriceAlerts(Long userId) {
+        return priceAlertRepository.findByUserId(userId)
+                .stream()
+                .map(this::mapToPriceAlertResponse)
+                .toList();
+
+    }
+
+    public List<PriceAlertResponse> getPriceAlerts(Long userId, PriceAlertStatus status) {
+        return priceAlertRepository.findByUserIdAndStatus(userId, status)
+                .stream()
+                .map(this::mapToPriceAlertResponse)
+                .toList();
     }
 
     private PriceAlertResponse mapToPriceAlertResponse(PriceAlert priceAlert) {
