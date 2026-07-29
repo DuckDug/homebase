@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import com.homebase.homebase.dto.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -56,5 +57,29 @@ public class GlobalExceptionHandler {
                 now
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException exception,
+            HttpServletRequest request,
+            Authentication authentication
+    ) {
+        LocalDateTime now = LocalDateTime.now();
+
+        log.warn(
+                "Argument Not Valid : {} | name={} | path={}",
+                exception.getBindingResult().getAllErrors(),
+                authentication.getName(),
+                request.getRequestURI()
+        );
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                exception.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
+                HttpStatus.BAD_REQUEST,
+                now
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }
