@@ -17,16 +17,19 @@ public class StockIngestionJob {
     private final StockQuoteRepository stockQuoteRepository;
     private final StockApiClient stockApiClient;
     private final JobLogRepository jobLogRepository;
+    private final AlertEvaluationJob alertEvaluationJob;
     private static final String JOBNAME = "StockIngestionJob";
 
     public StockIngestionJob(
             StockQuoteRepository stockQuoteRepository,
             StockApiClient stockApiClient,
-            JobLogRepository jobLogRepository
+            JobLogRepository jobLogRepository,
+            AlertEvaluationJob alertEvaluationJob
     ) {
         this.stockQuoteRepository = stockQuoteRepository;
         this.stockApiClient = stockApiClient;
         this.jobLogRepository = jobLogRepository;
+        this.alertEvaluationJob = alertEvaluationJob;
     }
 
     @Scheduled(cron = "0 0 8 * * *")
@@ -35,6 +38,7 @@ public class StockIngestionJob {
         String status = "SUCCESS";
         String errorMessage = null;
         int recordsProcessed = 0;
+        boolean succeeded = true;
 
         try{
             List<String> symbols = List.of(
@@ -64,6 +68,7 @@ public class StockIngestionJob {
             }
         } catch (Exception e) {
             status = "FAILED";
+            succeeded = false;
             errorMessage = e.getMessage();
         } finally {
             LocalDateTime end = LocalDateTime.now();
@@ -76,6 +81,10 @@ public class StockIngestionJob {
                     .errorMessage(errorMessage)
                     .recordsProcessed(recordsProcessed);
             jobLogRepository.save(builder.build());
+        }
+
+        if (succeeded) {
+            alertEvaluationJob.evaluatePriceAlerts();
         }
 
     }
