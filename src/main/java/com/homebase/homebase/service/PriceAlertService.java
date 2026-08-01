@@ -71,16 +71,19 @@ public class PriceAlertService {
         BigDecimal targetPrice = priceAlertUpdateRequest.getTargetPrice();
         PriceAlertCondition condition = priceAlertUpdateRequest.getCondition();
 
-        if (targetPrice == null && condition == null) {
-            throw new NoChangesProvidedException("Price Alert", priceAlertId);
-        }
-
         PriceAlert priceAlert = priceAlertRepository.findByIdAndUserId(priceAlertId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Price Alert", priceAlertId));
 
         BigDecimal effectiveTargetPrice = targetPrice != null ? targetPrice : priceAlert.getTargetPrice();
         PriceAlertCondition effectiveCondition = condition != null ? condition : priceAlert.getCondition();
         String symbol = priceAlert.getSymbol();
+
+        boolean noActualChange = effectiveTargetPrice.compareTo(priceAlert.getTargetPrice()) == 0
+                && effectiveCondition == priceAlert.getCondition();
+
+        if (noActualChange) {
+            throw new NoChangesProvidedException("Price Alert", priceAlertId);
+        }
 
         checkForDuplicate(userId, symbol, effectiveCondition, effectiveTargetPrice);
 
