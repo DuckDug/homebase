@@ -4,6 +4,7 @@ import com.homebase.homebase.dto.PriceAlertCreateRequest;
 import com.homebase.homebase.dto.PriceAlertResponse;
 import com.homebase.homebase.dto.PriceAlertUpdateRequest;
 import com.homebase.homebase.exception.DuplicateResourceException;
+import com.homebase.homebase.exception.NoChangesProvidedException;
 import com.homebase.homebase.exception.ResourceNotFoundException;
 import com.homebase.homebase.model.PriceAlert;
 import com.homebase.homebase.model.PriceAlertCondition;
@@ -69,6 +70,11 @@ public class PriceAlertService {
 
         BigDecimal targetPrice = priceAlertUpdateRequest.getTargetPrice();
         PriceAlertCondition condition = priceAlertUpdateRequest.getCondition();
+
+        if (targetPrice == null && condition == null) {
+            throw new NoChangesProvidedException("Price Alert", priceAlertId);
+        }
+
         PriceAlert priceAlert = priceAlertRepository.findByIdAndUserId(priceAlertId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Price Alert", priceAlertId));
 
