@@ -4,15 +4,16 @@ import com.homebase.homebase.model.PriceAlertCondition;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 public class PriceAlertCreateRequest {
 
     @NotBlank(message = "Symbol is Required.")
-    @Size(min = 1, max = 10, message = "Symbol must be between 1 and 10 characters")
+    @Pattern(regexp = "^[A-Z]{1,5}(\\.[A-Z])?$", message = "Symbol must be 1-5 letters, optionally with a share-class suffix (e.g. BRK.A)")
     private String symbol;
 
     @NotNull(message = "Target Price is required.")
@@ -22,7 +23,6 @@ public class PriceAlertCreateRequest {
 
     @NotNull(message = "Condition is Required.")
     private PriceAlertCondition condition;
-
 
     public void setSymbol(String symbol) {
         this.symbol = symbol == null ? null : symbol.trim().toUpperCase();
