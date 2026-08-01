@@ -22,4 +22,9 @@ public class PriceAlertCreateRequest {
 
     @NotNull(message = "Condition is Required.")
     private PriceAlertCondition condition;
+
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol == null ? null : symbol.trim().toUpperCase();
+    }
 }

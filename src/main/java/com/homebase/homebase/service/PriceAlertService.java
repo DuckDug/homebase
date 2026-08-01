@@ -25,7 +25,7 @@ public class PriceAlertService {
     }
 
     public PriceAlertResponse createPriceAlert(Long userId, PriceAlertCreateRequest priceAlertCreateRequest) {
-        String symbol = priceAlertCreateRequest.getSymbol().toUpperCase();
+        String symbol = priceAlertCreateRequest.getSymbol();
         PriceAlertCondition condition = priceAlertCreateRequest.getCondition();
         BigDecimal targetPrice = priceAlertCreateRequest.getTargetPrice();
 
