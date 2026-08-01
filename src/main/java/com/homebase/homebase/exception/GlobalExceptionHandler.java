@@ -82,4 +82,28 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    @ExceptionHandler(NoChangesProvidedException.class)
+    public ResponseEntity<ErrorResponse> handleNoChangesProvided(
+            NoChangesProvidedException exception,
+            HttpServletRequest request,
+            Authentication authentication
+    ) {
+        LocalDateTime now = LocalDateTime.now();
+
+        log.warn(
+                "No Changes Provided : {} | name={} | path={}",
+                exception.getMessage(),
+                authentication.getName(),
+                request.getRequestURI()
+        );
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                exception.getMessage(),
+                HttpStatus.BAD_REQUEST,
+                now
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
+    }
 }
