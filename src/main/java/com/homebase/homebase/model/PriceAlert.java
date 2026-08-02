@@ -44,6 +44,9 @@ public class PriceAlert {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "notified_at")
+    private LocalDateTime notifiedAt;
+
     @PrePersist
     protected void onCreate(){
         this.createdAt = LocalDateTime.now();
