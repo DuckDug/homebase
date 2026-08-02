@@ -35,3 +35,7 @@ rentcast:
 
 alpha-vantage:
   api-key: ${ALPHA_VANTAGE_API_KEY}
+
+resend:
+  api-key: ${RESEND_API_KEY}
+  alert-recipient: ${ALERT_RECIPIENT_EMAIL}
