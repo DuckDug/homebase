@@ -1,6 +1,8 @@
 package com.homebase.homebase.repository;
 
 import com.homebase.homebase.model.StockQuote;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +21,16 @@ public interface StockQuoteRepository extends JpaRepository<StockQuote, Long> {
 
     @Query(value = "SELECT DISTINCT ON (symbol) * FROM stock_quotes WHERE symbol IN :symbols ORDER BY symbol, quote_date DESC", nativeQuery = true)
     List<StockQuote> findLatestQuotesForSymbols(@Param("symbols") List<String> symbols);
+
+    @Query(
+        value = "SELECT DISTINCT ON (symbol) * FROM stock_quotes " +
+                "WHERE (:symbol IS NULL OR symbol = :symbol) " +
+                "ORDER BY symbol, quote_date DESC",
+        countQuery = "SELECT COUNT(DISTINCT symbol) FROM stock_quotes " +
+                "WHERE (:symbol IS NULL OR symbol = :symbol)",
+        nativeQuery = true
+    )
+    Page<StockQuote> findLatestQuotes(@Param("symbol") String symbol, Pageable pageable);
 
     Optional<StockQuote> findBySymbolAndQuoteDate(String symbol, LocalDate quoteDate);
 
