@@ -6,6 +6,7 @@ import com.homebase.homebase.model.PriceAlert;
 import com.homebase.homebase.model.PriceAlertStatus;
 import com.homebase.homebase.repository.JobLogRepository;
 import com.homebase.homebase.repository.PriceAlertRepository;
+import com.homebase.homebase.service.UserPreferenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,16 +17,19 @@ import java.util.List;
 @Component
 @Slf4j
 public class AlertNotificationJob {
+    private final UserPreferenceService userPreferenceService;
     private final PriceAlertRepository priceAlertRepository;
     private final JobLogRepository jobLogRepository;
     private final EmailClient emailClient;
     private static final String JOBNAME = "AlertNotificationJob";
 
     public AlertNotificationJob(
+            UserPreferenceService userPreferenceService,
             PriceAlertRepository priceAlertRepository,
             JobLogRepository jobLogRepository,
             EmailClient emailClient
     ) {
+        this.userPreferenceService = userPreferenceService;
         this.priceAlertRepository = priceAlertRepository;
         this.jobLogRepository = jobLogRepository;
         this.emailClient = emailClient;
@@ -44,9 +48,13 @@ public class AlertNotificationJob {
 
             for (PriceAlert priceAlert : triggeredPriceAlerts) {
                 try {
-                    String subject = buildSubject(priceAlert);
-                    String body = buildBody(priceAlert);
-                    emailClient.sendAlertEmail(subject, body);
+                    boolean isEmailNotificationEnabled = userPreferenceService.isEmailNotificationsEnabled(priceAlert.getUserId());
+                    if (isEmailNotificationEnabled) {
+                        String subject = buildSubject(priceAlert);
+                        String body = buildBody(priceAlert);
+                        emailClient.sendAlertEmail(subject, body);
+                    }
+
                     priceAlert.setNotifiedAt(LocalDateTime.now());
                     priceAlertRepository.save(priceAlert);
                     recordsProcessed++;
